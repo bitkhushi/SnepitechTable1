@@ -4,11 +4,10 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import * as XLSX from "xlsx/xlsx.mjs";
+import { CSVLink } from 'react-csv';
 
-
-// import ExcelJS from 'exceljs';
-// import { saveAs } from 'file-saver';
 
 const Table1 = () => {
 
@@ -19,6 +18,11 @@ const Table1 = () => {
     const [sortOrder, setSortOrder] = useState("asc");
     const [MenuVisible, setMenuVisible] = useState(false);
     const [ListExportMenuVisible, setListExportMenuVisible] = useState(false);
+    // -----------------------------------------------------------
+    const [dragging, setDragging] = useState(false);
+    const [draggingColumn, setDraggingColumn] = useState(null);
+    const [initialWidth, setInitialWidth] = useState(0);
+    const [columnWidths, setColumnWidths] = useState([100, 100, 100, 100, 100]);
 
     const fetchData = async () => {
         try {
@@ -34,9 +38,9 @@ const Table1 = () => {
         fetchData();
     }, []);
 
+
     const handlethselect = (colindex) => {
         setcolIndex(colindex);
-        console.log(colindex);
 
     }
     const SortIcon = ({ onClick, sortOrder }) => {
@@ -55,7 +59,7 @@ const Table1 = () => {
             );
         }
     };
-    const handleSearchFilter = (e) => {
+    const handleSearchFilterFirstName = (e) => {
         const searchValue = e.target.value.toLowerCase();
         if (searchValue !== '') {
             const filteredData = data.filter((item) => {
@@ -104,6 +108,7 @@ const Table1 = () => {
         setSearch(searchValue);
     };
     const handleSearchFilterId = (e) => {
+        console.log(e);
         const searchValue = e.target.value;
         if (searchValue !== '') {
             const filteredData = data.filter((item) => {
@@ -151,118 +156,161 @@ const Table1 = () => {
 
     };
     const handleMouseDown = (event) => {
-
+        console.log(event);
         if (event.button === 2) {
             setMenuVisible(true)
             console.log(event.button);
         } else if (event.button === 0) {
             setMenuVisible(false)
         }
-        // setMenuVisible(true)
 
 
-        event.preventDefault();
     };
-
     const click = (event) => {
-        console.log("okiiiess");
-        setListExportMenuVisible(true)
-    }
 
+        setListExportMenuVisible(true)
+
+
+    }
+    const HanadleExExport = () => {
+
+
+        const sheetData = searchFilter.length > 0 ? searchFilter : data;
+        const exportData = sheetData.map((item) => ({
+            id: item.id,
+            firstName: item.firstName,
+            lastName: item.lastName,
+            maidenName: item.maidenName,
+            age: item.age,
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+
+        const fileName = 'my_exported_data.xlsx';
+
+
+        XLSX.writeFile(workbook, fileName);
+    };
+    const headers = [
+
+        { label: "ID", key: "id" },
+        { label: "First Name", key: "firstName" },
+        { label: "Last Name", key: "lastName" },
+        { label: "Maiden Name", key: "maidenName" },
+        { label: "Age", key: "age" },
+
+    ];
+    const dataAsArray = data.map(item => ({
+        id: item.id,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        maidenName: item.maidenName,
+        age: item.age,
+    }));
+    //    ----------------------------------------------------------------------------------
+    const handleColumnResizeStart = (index) => (event) => {
+        console.log(index, event);
+        setDragging(true);
+        setDraggingColumn(index);
+        setInitialWidth(event.clientX);
+    };
+    const handleColumnResize = (event) => {
+        if (dragging) {
+            const newWidth = event.clientX - initialWidth;
+            // Assuming you have the column widths in an array called 'columnWidths'
+            const newColumnWidths = [...columnWidths];
+            newColumnWidths[draggingColumn] += newWidth;
+            setColumnWidths(newColumnWidths);
+            setInitialWidth(event.clientX);
+        }
+    };
+    const handleColumnResizeEnd = () => {
+        setDragging(false);
+    };
 
     return (
         <>
 
-            {/* <style>
-                {`
-                
-              .selected {
-                     background-color: lightblue;
-                 }
-               
-                
-                 td.right-align {
-                     text-align: right;
-                 }
 
-                 td.center-align {
-                     text-align: center;
-                 }
-
-                 td.left-align{
-                     text-align:left;
-                 }`
-
-
-
-
-                }
-            </style> */}
             <div className='Menu' onMouseDown={handleMouseDown}>
 
 
-                <table responsive border={1} style={{ width: 'auto' }}  >
+                <table responsive border={1} style={{ tableLayout: 'auto' }} onMouseMove={handleColumnResize} // Handle column resizing on mouse move
+                    onMouseUp={handleColumnResizeEnd} >
                     <thead>
 
                         <tr>
 
-                            <th
-                                className={colNumber === 0 ? 'selected' : ''}
-                                onClick={() => handlethselect(0)}>
+                            <th className={colNumber === 0 ? 'selected' : ''}
+                                onClick={() => handlethselect(0)}
+                                style={{ width: columnWidths[0] }} 
+                                onMouseDown={(event) => handleMouseDown(event, 0)}>
+
                                 id
+
                                 <SortIcon
                                     onClick={() => handleSort('id')}
                                     sortOrder={colNumber === 0 ? sortOrder : ''}
                                 />
-
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(0)} />
 
                             </th>
 
                             <th className={colNumber === 1 ? 'selected' : ''}
-                                onClick={() => handlethselect(1)}>
+                                onClick={() => handlethselect(1)}
+                                style={{ width: columnWidths[1] }} 
+                                onMouseDown={(event) => handleMouseDown(event, 1)}>
                                 FirstName
                                 <SortIcon
                                     onClick={() => handleSort('firstName')}
                                     sortOrder={colNumber === 1 ? sortOrder : ''}
                                 />
-
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(1)} />
 
                             </th>
                             <th className={colNumber === 2 ? 'selected' : ''}
-                                onClick={() => handlethselect(2)}>
+                                onClick={() => handlethselect(2)}
+                                style={{ width: columnWidths[2] }} >
                                 LastName
                                 <SortIcon
                                     onClick={() => handleSort('lastName')}
                                     sortOrder={colNumber === 2 ? sortOrder : ''}
                                 />
-
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(2)} />
 
                             </th>
                             <th className={colNumber === 3 ? 'selected' : ''}
-                                onClick={() => handlethselect(3)}>
+                                onClick={() => handlethselect(3)}
+                                style={{ width: columnWidths[3] }} >
                                 MaidenName
                                 <SortIcon
                                     onClick={() => handleSort('maidenName')}
                                     sortOrder={colNumber === 3 ? sortOrder : ''}
                                 />
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(3)} />
 
 
                             </th>
                             <th className={colNumber === 4 ? 'selected' : ''}
-                                onClick={() => handlethselect(4)}>
+                                onClick={() => handlethselect(4)}
+                                style={{ width: columnWidths[4] }} >
                                 Age
                                 <SortIcon
                                     onClick={() => handleSort('age')}
                                     sortOrder={colNumber === 4 ? sortOrder : ''}
                                 />
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(4)} />
                             </th>
 
                         </tr>
                         <th>
-                            <input onChange={handleSearchFilterId} />
+                            <input type='text' onChange={handleSearchFilterId} />
                         </th>
                         <th>
-                            <input onChange={handleSearchFilter} />
+                            <input onChange={handleSearchFilterFirstName} />
                         </th>
                         <th>
                             <input onChange={handleSearchFilterLastName} />
@@ -300,35 +348,10 @@ const Table1 = () => {
                         ))}
                     </tbody>
                 </table>
+
             </div>
 
-            {/* {
-                ListExportMenuVisible && (
 
-                    <div class="wrapperListOfExport">
-                        <div class="content">
-
-
-                            <li class="item share">
-
-
-                                <ul class="share-menu">
-                                    <li class="item">
-                                        <i class="uil uil-twitter-alt"></i>
-                                        <span>Twitter</span>
-                                    </li>
-                                    <li class="item">
-                                        <i class="uil uil-instagram"></i>
-                                        <span>Instagram</span>
-                                    </li>
-
-                                </ul>
-                            </li>
-                        </div>
-                    </div>
-
-                )
-            } */}
 
             {
                 MenuVisible && (
@@ -350,35 +373,41 @@ const Table1 = () => {
                                 </li>
                                 <li className="item">
                                     <FileDownloadOutlinedIcon />
-                                    <span>Export To Excel<ArrowRightIcon  onClick={click} className='iconright'/>
-                                       
+                                    <span>Export To Excel<ArrowDropDownIcon onClick={click} className='iconright' />
+
                                     </span>
                                 </li>
-                                <li className="item">
+
                                 {
-                                            ListExportMenuVisible && (
-                                               <>
-                                                <>
-                                                    <li className="itemlist">
+                                    ListExportMenuVisible && (
+                                        <div className='ExcelDropDownList'>
+                                            <>
+                                                <li className="item" onClick={HanadleExExport}>
+                                                    <li className="itemlist" >
 
-                                                        <span>CSV Export</span>
-
-                                                    </li>
-                                                    </>
-                                                    <>
-                                                         <li className="itemlist1">
-
-                                                        <span>Excel Export</span>
+                                                        <span >Excel Export</span>
 
                                                     </li>
-                                                    
-                                                   
-                                                </>
-                                               </>
+                                                </li>
+                                            </>
+                                            <>
+                                                <li className="item">
+                                                    <li className="itemlist1">
 
-                                            )
-                                        }
-                                </li>
+                                                        <CSVLink data={dataAsArray} headers={headers} style={{ color: 'black', textDecoration: 'none' }}>
+                                                            <span>CSV Export</span>
+                                                        </CSVLink>
+
+                                                    </li>
+                                                </li>
+
+
+                                            </>
+                                        </div>
+
+                                    )
+                                }
+                                {/* </li> */}
                             </ul>
                         </div>
                     </div>
