@@ -8,9 +8,6 @@
     background: #fff;
 
 }
-/* .ExcelDropDownList{
-   
-} */
 .iconright{
     position: absolute; 
     left: 273px;
@@ -19,17 +16,18 @@
 
 .itemlist {
     position: absolute;
-    top: 91%;
+    top: 86%;
 }
 .itemlist1 {
     position: absolute;
-    top: 78%;
+    top: 79%;
 }
+
 
 .wrapper {
     position: absolute;
     width: 300px;
-    height: 316px;
+    height: 350px;
     top: 34%;
     left: 31%;
     border-radius: 10px;
@@ -62,9 +60,6 @@
     margin-left: 8px;
     font-size: 16px;
 }
-
-
-
 .content .share {
     position: relative;
     justify-content: space-between;
@@ -77,15 +72,9 @@
 .Menu {
     position: relative;
 }
-
-
-
-
 .selected {
     background-color: lightblue;
 }
-
-
 td.right-align {
     text-align: right;
 }
@@ -120,3 +109,14 @@ td.left-align {
     opacity: 1;
     pointer-events: auto;
 }
+.auto{
+    width: auto;
+}
+/* .setWidthcolumns{
+    width:auto;
+} */
+
+/* .css-i4bv87-MuiSvgIcon-root{
+   
+    padding-left:157px;
+} */

@@ -7,6 +7,7 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import * as XLSX from "xlsx/xlsx.mjs";
 import { CSVLink } from 'react-csv';
+import { ImportantDevices } from '@mui/icons-material';
 
 
 const Table1 = () => {
@@ -23,6 +24,9 @@ const Table1 = () => {
     const [draggingColumn, setDraggingColumn] = useState(null);
     const [initialWidth, setInitialWidth] = useState(0);
     const [columnWidths, setColumnWidths] = useState([100, 100, 100, 100, 100]);
+    // --------------------------------------------------------------
+
+    const [columnAutoWidth, setColumnAutoWidth] = useState(false)
 
     const fetchData = async () => {
         try {
@@ -37,7 +41,7 @@ const Table1 = () => {
     useEffect(() => {
         fetchData();
     }, []);
-
+   
 
     const handlethselect = (colindex) => {
         setcolIndex(colindex);
@@ -173,8 +177,6 @@ const Table1 = () => {
 
     }
     const HanadleExExport = () => {
-
-
         const sheetData = searchFilter.length > 0 ? searchFilter : data;
         const exportData = sheetData.map((item) => ({
             id: item.id,
@@ -210,9 +212,8 @@ const Table1 = () => {
         maidenName: item.maidenName,
         age: item.age,
     }));
-    //    ----------------------------------------------------------------------------------
+
     const handleColumnResizeStart = (index) => (event) => {
-        console.log(index, event);
         setDragging(true);
         setDraggingColumn(index);
         setInitialWidth(event.clientX);
@@ -220,7 +221,6 @@ const Table1 = () => {
     const handleColumnResize = (event) => {
         if (dragging) {
             const newWidth = event.clientX - initialWidth;
-            // Assuming you have the column widths in an array called 'columnWidths'
             const newColumnWidths = [...columnWidths];
             newColumnWidths[draggingColumn] += newWidth;
             setColumnWidths(newColumnWidths);
@@ -230,7 +230,27 @@ const Table1 = () => {
     const handleColumnResizeEnd = () => {
         setDragging(false);
     };
+    // ----------------------------------------------------------
 
+    // const HandleAutoWidthOfColumn = () => {
+    //     setColumnAutoWidth(true)
+    // }
+    const HandleAutoWidthOfColumn = () => {
+        // Calculate auto width for each column based on the content
+        const newColumnWidths = data.reduce((widths, item) => {
+          Object.keys(item).forEach((key, index) => {
+            const cellContent = item[key].toString();
+            const cellWidth = cellContent.length * 10; // You can adjust the multiplier as per your requirement
+            if (!widths[index] || cellWidth > widths[index]) {
+              // Update the width only if the new width is greater than the existing one
+              widths[index] = cellWidth;
+            }
+          });
+          return widths;
+        }, []);
+      
+        setColumnWidths(newColumnWidths); // Update the columnWidths state with the new widths
+      };
     return (
         <>
 
@@ -238,7 +258,7 @@ const Table1 = () => {
             <div className='Menu' onMouseDown={handleMouseDown}>
 
 
-                <table responsive border={1} style={{ tableLayout: 'auto' }} onMouseMove={handleColumnResize} // Handle column resizing on mouse move
+                <table responsive border={1} onMouseMove={handleColumnResize}
                     onMouseUp={handleColumnResizeEnd} >
                     <thead>
 
@@ -246,30 +266,35 @@ const Table1 = () => {
 
                             <th className={colNumber === 0 ? 'selected' : ''}
                                 onClick={() => handlethselect(0)}
-                                style={{ width: columnWidths[0] }} 
+                                // style={{ width: columnWidths[0] }}
+                                // style={{width:'auto !Important'}}
+                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[0] + 'px' }}
                                 onMouseDown={(event) => handleMouseDown(event, 0)}>
 
-                                id
+                                <span>id</span>
 
                                 <SortIcon
                                     onClick={() => handleSort('id')}
                                     sortOrder={colNumber === 0 ? sortOrder : ''}
                                 />
+
                                 <MoreVertIcon onMouseDown={handleColumnResizeStart(0)} />
+
+
 
                             </th>
 
                             <th className={colNumber === 1 ? 'selected' : ''}
                                 onClick={() => handlethselect(1)}
-                                style={{ width: columnWidths[1] }} 
+                                style={{ width: columnWidths[1] }}
                                 onMouseDown={(event) => handleMouseDown(event, 1)}>
                                 FirstName
                                 <SortIcon
                                     onClick={() => handleSort('firstName')}
                                     sortOrder={colNumber === 1 ? sortOrder : ''}
                                 />
-                                <MoreVertIcon onMouseDown={handleColumnResizeStart(1)} />
 
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(1)} />
                             </th>
                             <th className={colNumber === 2 ? 'selected' : ''}
                                 onClick={() => handlethselect(2)}
@@ -296,7 +321,8 @@ const Table1 = () => {
                             </th>
                             <th className={colNumber === 4 ? 'selected' : ''}
                                 onClick={() => handlethselect(4)}
-                                style={{ width: columnWidths[4] }} >
+                                style={{ width: columnWidths[4] }}
+                                onMouseDown={(event) => handleMouseDown(event, 4)}>
                                 Age
                                 <SortIcon
                                     onClick={() => handleSort('age')}
@@ -307,7 +333,7 @@ const Table1 = () => {
 
                         </tr>
                         <th>
-                            <input type='text' onChange={handleSearchFilterId} />
+                            <input onChange={handleSearchFilterId} />
                         </th>
                         <th>
                             <input onChange={handleSearchFilterFirstName} />
@@ -327,9 +353,9 @@ const Table1 = () => {
 
                             <tr key={item.id}>
 
-                                <td className={`${colNumber === 0 ? 'selected' : ''
-                                    } right-align`}
-                                    onClick={() => handlethselect(0)}>{item.id}</td>
+                                <td className={`${colNumber === 0 ? 'selected right-align' : 'right-align'
+                                    } `}
+                                    onClick={() => handlethselect(0)} >{item.id}</td>
 
                                 <td className={`${colNumber === 1 ? 'selected center-align' : 'center-align'}`}
                                     onClick={() => handlethselect(1)}>{item.firstName}</td>
@@ -340,8 +366,8 @@ const Table1 = () => {
                                 <td className={`${colNumber === 3 ? 'selected center-align' : 'center-align'}`}
                                     onClick={() => handlethselect(3)}>{item.maidenName}</td>
 
-                                <td className={`${colNumber === 4 ? 'selected' : ''
-                                    } right-align`}
+                                <td className={`${colNumber === 4 ? 'selected right-align' : 'right-align'
+                                    } `}
                                     onClick={() => handlethselect(4)}>{item.age}</td>
                             </tr>
 
@@ -359,6 +385,10 @@ const Table1 = () => {
                     <div className="wrapper">
                         <div className="content">
                             <ul className="menu">
+                                <li className="item" >
+                                    <ContentPasteIcon onClick={HandleAutoWidthOfColumn}/>
+                                    <span>AutoWidth</span>
+                                </li>
                                 <li className="item">
                                     <ContentCopyIcon />
                                     <span>Copy</span>
@@ -407,7 +437,7 @@ const Table1 = () => {
 
                                     )
                                 }
-                                {/* </li> */}
+
                             </ul>
                         </div>
                     </div>
