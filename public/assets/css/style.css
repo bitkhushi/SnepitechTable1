@@ -8,8 +8,9 @@
     background: #fff;
 
 }
-.iconright{
-    position: absolute; 
+
+.iconright {
+    position: absolute;
     left: 273px;
     font-size: 200px;
 }
@@ -18,6 +19,7 @@
     position: absolute;
     top: 86%;
 }
+
 .itemlist1 {
     position: absolute;
     top: 79%;
@@ -60,6 +62,7 @@
     margin-left: 8px;
     font-size: 16px;
 }
+
 .content .share {
     position: relative;
     justify-content: space-between;
@@ -72,11 +75,17 @@
 .Menu {
     position: relative;
 }
+
 .selected {
     background-color: lightblue;
 }
+
 td.right-align {
     text-align: right;
+}
+
+th.center-alignth {
+    text-align: center;
 }
 
 td.center-align {
@@ -109,14 +118,70 @@ td.left-align {
     opacity: 1;
     pointer-events: auto;
 }
-.auto{
+
+.auto {
     width: auto;
 }
-/* .setWidthcolumns{
-    width:auto;
-} */
 
-/* .css-i4bv87-MuiSvgIcon-root{
-   
-    padding-left:157px;
+.iconstyle {
+    position: relative;
+    z-index: 999;
+    /* left: 62px; */
+    right: -20px;
+}
+.iconstyleth {
+    position: relative;
+}
+.iconstyle1 {
+    position: relative;
+    left: 30px;
+}
+
+.iconstyle2 {
+    position: relative;
+    left: 30px;
+}
+
+.iconstyle3 {
+    position: relative;
+    left: 18px;
+}
+
+.iconstyle4 {
+    position: relative;
+    left: 54px;
+}
+
+
+.fn {
+    position: relative;
+    left: 16px;
+}
+
+/* .dotted-table {
+    border-collapse: collapse;
+  
+}
+
+.dotted-table td,
+.dotted-table th {
+    border: 2px dotted rgba(0, 0, 0, 0.2);;
+    padding: 8px;
+    
 } */
+.styleColumn {
+    padding: 10px;
+}
+.styleth{
+    width: 84px;
+}
+.light-border-table {
+    border-collapse: collapse;
+}
+
+.light-border-table td,
+.light-border-table th {
+
+    border: 1px solid #ddd;
+    
+}

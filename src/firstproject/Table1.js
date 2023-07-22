@@ -7,7 +7,6 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import * as XLSX from "xlsx/xlsx.mjs";
 import { CSVLink } from 'react-csv';
-import { ImportantDevices } from '@mui/icons-material';
 
 
 const Table1 = () => {
@@ -19,14 +18,16 @@ const Table1 = () => {
     const [sortOrder, setSortOrder] = useState("asc");
     const [MenuVisible, setMenuVisible] = useState(false);
     const [ListExportMenuVisible, setListExportMenuVisible] = useState(false);
-    // -----------------------------------------------------------
+    const [styleColumnAutoWidth, setStyleColumnAutoWidth] = useState(false);
+
     const [dragging, setDragging] = useState(false);
     const [draggingColumn, setDraggingColumn] = useState(null);
     const [initialWidth, setInitialWidth] = useState(0);
-    const [columnWidths, setColumnWidths] = useState([100, 100, 100, 100, 100]);
-    // --------------------------------------------------------------
+    const [columnWidths, setColumnWidths] = useState([150, 150, 150, 150, 150]);
+    // const [resizingFromHeader, setResizingFromHeader] = useState(false);
 
-    const [columnAutoWidth, setColumnAutoWidth] = useState(false)
+
+    const [columnAutoWidth, setColumnAutoWidth] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -41,7 +42,7 @@ const Table1 = () => {
     useEffect(() => {
         fetchData();
     }, []);
-   
+
 
     const handlethselect = (colindex) => {
         setcolIndex(colindex);
@@ -54,12 +55,12 @@ const Table1 = () => {
             );
         } else if (sortOrder === 'desc') {
             return (
-                <ArrowDropUpIcon onClick={onClick} className='changeicon' />
+                <ArrowDropUpIcon onClick={onClick} />
             );
         }
         else {
             return (
-                <ArrowDropUpIcon onClick={onClick} className='changeicon' />
+                <ArrowDropDownIcon onClick={onClick} />
             );
         }
     };
@@ -160,14 +161,14 @@ const Table1 = () => {
 
     };
     const handleMouseDown = (event) => {
-        console.log(event);
+        
         if (event.button === 2) {
             setMenuVisible(true)
             console.log(event.button);
         } else if (event.button === 0) {
             setMenuVisible(false)
         }
-
+        
 
     };
     const click = (event) => {
@@ -214,71 +215,100 @@ const Table1 = () => {
     }));
 
     const handleColumnResizeStart = (index) => (event) => {
-        setDragging(true);
-        setDraggingColumn(index);
-        setInitialWidth(event.clientX);
+        if (event.button === 2) {
+            setDragging(true);
+            setDraggingColumn(index);
+            setInitialWidth(event.clientX);
+            event.preventDefault();
+          }
     };
     const handleColumnResize = (event) => {
-        if (dragging) {
+        // if (dragging ) {
+        //     const newWidth = event.clientX - initialWidth;
+        //     const newColumnWidths = [...columnWidths];
+        //     newColumnWidths[draggingColumn] += newWidth;
+        //     setColumnWidths(newColumnWidths);
+        //     setInitialWidth(event.clientX);
+        // }
+        event.preventDefault();
+        if (dragging && event.button === 0 && draggingColumn !== 0) {
             const newWidth = event.clientX - initialWidth;
-            const newColumnWidths = [...columnWidths];
-            newColumnWidths[draggingColumn] += newWidth;
+            const newColumnWidths = columnWidths.map((width, index) => {
+                console.log(width,index);
+              if (index === draggingColumn) {
+                const minWidth = 80; // Minimum width for the column
+                const updatedWidth = width + newWidth;
+                return updatedWidth < minWidth ? minWidth : updatedWidth;
+              }
+              return width;
+            });
+        
             setColumnWidths(newColumnWidths);
-            setInitialWidth(event.clientX);
-        }
+          }
     };
     const handleColumnResizeEnd = () => {
         setDragging(false);
     };
-    // ----------------------------------------------------------
 
-    // const HandleAutoWidthOfColumn = () => {
-    //     setColumnAutoWidth(true)
-    // }
     const HandleAutoWidthOfColumn = () => {
-        // Calculate auto width for each column based on the content
+
+        const columnsToCalculate = ['id', 'firstName', 'lastName', 'maidenName', 'age'];
+
         const newColumnWidths = data.reduce((widths, item) => {
-          Object.keys(item).forEach((key, index) => {
-            const cellContent = item[key].toString();
-            const cellWidth = cellContent.length * 10; // You can adjust the multiplier as per your requirement
-            if (!widths[index] || cellWidth > widths[index]) {
-              // Update the width only if the new width is greater than the existing one
-              widths[index] = cellWidth;
-            }
-          });
-          return widths;
+            columnsToCalculate.forEach((key, index) => {
+                
+                
+                const cellContent = item[key].toString();
+                console.log(cellContent);
+                const cellWidth = cellContent.length * 20;
+                console.log(cellWidth);
+                if (!widths[index] || cellWidth > widths[index]) {
+                    widths[index] = cellWidth;
+                }
+            });
+
+            return widths;
         }, []);
-      
-        setColumnWidths(newColumnWidths); // Update the columnWidths state with the new widths
-      };
+
+        setColumnWidths(newColumnWidths);
+        setStyleColumnAutoWidth(true)
+    };
+
+
     return (
         <>
+            <div className='Menu' onMouseDown={handleMouseDown} >
 
 
-            <div className='Menu' onMouseDown={handleMouseDown}>
+                <table responsive onMouseMove={handleColumnResize}
+                    onMouseUp={handleColumnResizeEnd}
+                    // border={1}
+                    className="light-border-table"
+                >
 
-
-                <table responsive border={1} onMouseMove={handleColumnResize}
-                    onMouseUp={handleColumnResizeEnd} >
                     <thead>
 
-                        <tr>
-
+                        <tr className='center-alignth'>
+                            {/* ${styleColumnAutoWidth?'styleColumn':''}` */}
                             <th className={colNumber === 0 ? 'selected' : ''}
                                 onClick={() => handlethselect(0)}
-                                // style={{ width: columnWidths[0] }}
-                                // style={{width:'auto !Important'}}
-                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[0] + 'px' }}
+                                style={{ width: columnAutoWidth ? '80px' : columnWidths[0] + 'px' }}
+                                // style={{
+                                //     width: columnWidths[0], textAlign: 'center'
+
+                                // }}
                                 onMouseDown={(event) => handleMouseDown(event, 0)}>
+                                <span className='fn'>
+                                    {/* id  */}
+                                    id
+                                    <SortIcon
+                                        onClick={() => handleSort('id')}
+                                        sortOrder={colNumber === 0 ? sortOrder : ''}
+                                    />
+                                </span>
 
-                                <span>id</span>
 
-                                <SortIcon
-                                    onClick={() => handleSort('id')}
-                                    sortOrder={colNumber === 0 ? sortOrder : ''}
-                                />
-
-                                <MoreVertIcon onMouseDown={handleColumnResizeStart(0)} />
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(0)} className='iconstyle' />
 
 
 
@@ -288,34 +318,58 @@ const Table1 = () => {
                                 onClick={() => handlethselect(1)}
                                 style={{ width: columnWidths[1] }}
                                 onMouseDown={(event) => handleMouseDown(event, 1)}>
-                                FirstName
+                                <span className='fn'>
+
+                                    FirstName
+                                    <SortIcon
+                                        onClick={() => handleSort('firstName')}
+                                        sortOrder={colNumber === 1 ? sortOrder : ''}
+                                    />
+                                </span>
+                                {/* FirstName
                                 <SortIcon
                                     onClick={() => handleSort('firstName')}
                                     sortOrder={colNumber === 1 ? sortOrder : ''}
-                                />
-
-                                <MoreVertIcon onMouseDown={handleColumnResizeStart(1)} />
+                                /> */}
+                                
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(1)} className='iconstyle1' />
                             </th>
                             <th className={colNumber === 2 ? 'selected' : ''}
                                 onClick={() => handlethselect(2)}
                                 style={{ width: columnWidths[2] }} >
-                                LastName
+                                <span className='fn'>
+
+                                    LastName
+                                    <SortIcon
+                                        onClick={() => handleSort('lastName')}
+                                        sortOrder={colNumber === 2 ? sortOrder : ''}
+                                    />
+                                </span>
+                                {/* LastName
                                 <SortIcon
                                     onClick={() => handleSort('lastName')}
                                     sortOrder={colNumber === 2 ? sortOrder : ''}
-                                />
-                                <MoreVertIcon onMouseDown={handleColumnResizeStart(2)} />
+                                /> */}
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(2)} className='iconstyle2' />
 
                             </th>
                             <th className={colNumber === 3 ? 'selected' : ''}
                                 onClick={() => handlethselect(3)}
                                 style={{ width: columnWidths[3] }} >
-                                MaidenName
+                                <span className='fn'>
+
+                                    MaidenName
+                                    <SortIcon
+                                        onClick={() => handleSort('maidenName')}
+                                        sortOrder={colNumber === 3 ? sortOrder : ''}
+                                    />
+                                </span>
+                                {/* MaidenName
                                 <SortIcon
                                     onClick={() => handleSort('maidenName')}
                                     sortOrder={colNumber === 3 ? sortOrder : ''}
-                                />
-                                <MoreVertIcon onMouseDown={handleColumnResizeStart(3)} />
+                                /> */}
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(3)} className='iconstyle3' />
 
 
                             </th>
@@ -323,29 +377,43 @@ const Table1 = () => {
                                 onClick={() => handlethselect(4)}
                                 style={{ width: columnWidths[4] }}
                                 onMouseDown={(event) => handleMouseDown(event, 4)}>
-                                Age
+                                <span className='fn'>
+
+                                    Age
+                                    <SortIcon
+                                        onClick={() => handleSort('age')}
+                                        sortOrder={colNumber === 4 ? sortOrder : ''}
+                                    />
+                                </span>
+                                {/* Age
                                 <SortIcon
                                     onClick={() => handleSort('age')}
                                     sortOrder={colNumber === 4 ? sortOrder : ''}
-                                />
-                                <MoreVertIcon onMouseDown={handleColumnResizeStart(4)} />
+                                /> */}
+                                <MoreVertIcon onMouseDown={handleColumnResizeStart(4)} className='iconstyle4' />
                             </th>
 
                         </tr>
                         <th>
-                            <input onChange={handleSearchFilterId} />
+                            <input onChange={handleSearchFilterId}
+                                style={{ width: columnAutoWidth ? '84px' : columnWidths[0] + 'px' }}
+                            />
                         </th>
                         <th>
-                            <input onChange={handleSearchFilterFirstName} />
+                            <input onChange={handleSearchFilterFirstName}
+                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[1] + 'px' }} />
                         </th>
                         <th>
-                            <input onChange={handleSearchFilterLastName} />
+                            <input onChange={handleSearchFilterLastName}
+                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[2] + 'px' }} />
                         </th>
                         <th>
-                            <input onChange={handleSearchFilterMeidenName} />
+                            <input onChange={handleSearchFilterMeidenName}
+                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[3] + 'px' }} />
                         </th>
                         <th>
-                            <input onChange={handleSearchFilterAge} />
+                            <input onChange={handleSearchFilterAge}
+                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[4] + 'px' }} />
                         </th>
                     </thead>
                     <tbody>
@@ -366,8 +434,7 @@ const Table1 = () => {
                                 <td className={`${colNumber === 3 ? 'selected center-align' : 'center-align'}`}
                                     onClick={() => handlethselect(3)}>{item.maidenName}</td>
 
-                                <td className={`${colNumber === 4 ? 'selected right-align' : 'right-align'
-                                    } `}
+                                <td className={`${colNumber === 4 ? 'selected right-align' : 'right-align'} `}
                                     onClick={() => handlethselect(4)}>{item.age}</td>
                             </tr>
 
@@ -386,7 +453,7 @@ const Table1 = () => {
                         <div className="content">
                             <ul className="menu">
                                 <li className="item" >
-                                    <ContentPasteIcon onClick={HandleAutoWidthOfColumn}/>
+                                    <ContentPasteIcon onClick={HandleAutoWidthOfColumn} />
                                     <span>AutoWidth</span>
                                 </li>
                                 <li className="item">
@@ -434,6 +501,7 @@ const Table1 = () => {
 
                                             </>
                                         </div>
+
 
                                     )
                                 }
