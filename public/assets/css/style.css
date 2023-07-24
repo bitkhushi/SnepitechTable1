@@ -125,7 +125,6 @@ td.left-align {
 
 .iconstyle {
     position: relative;
-    z-index: 999;
     /* left: 62px; */
     right: -20px;
 }
@@ -149,7 +148,8 @@ td.left-align {
 
 .iconstyle4 {
     position: relative;
-    left: 54px;
+    right: -22px;
+    /* left: 54px; */
 }
 
 

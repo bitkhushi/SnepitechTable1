@@ -14,7 +14,7 @@ const Table1 = () => {
     const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
     const [searchFilter, setSearchFilter] = useState([]);
-    const [colNumber, setcolIndex] = useState(null);
+    const [colNumber, setColNumber] = useState(null);
     const [sortOrder, setSortOrder] = useState("asc");
     const [MenuVisible, setMenuVisible] = useState(false);
     const [ListExportMenuVisible, setListExportMenuVisible] = useState(false);
@@ -24,9 +24,6 @@ const Table1 = () => {
     const [draggingColumn, setDraggingColumn] = useState(null);
     const [initialWidth, setInitialWidth] = useState(0);
     const [columnWidths, setColumnWidths] = useState([150, 150, 150, 150, 150]);
-    // const [resizingFromHeader, setResizingFromHeader] = useState(false);
-
-
     const [columnAutoWidth, setColumnAutoWidth] = useState(false);
 
     const fetchData = async () => {
@@ -45,7 +42,7 @@ const Table1 = () => {
 
 
     const handlethselect = (colindex) => {
-        setcolIndex(colindex);
+        setColNumber(colindex);
 
     }
     const SortIcon = ({ onClick, sortOrder }) => {
@@ -161,14 +158,14 @@ const Table1 = () => {
 
     };
     const handleMouseDown = (event) => {
-        
+
         if (event.button === 2) {
             setMenuVisible(true)
             console.log(event.button);
         } else if (event.button === 0) {
             setMenuVisible(false)
         }
-        
+
 
     };
     const click = (event) => {
@@ -215,37 +212,59 @@ const Table1 = () => {
     }));
 
     const handleColumnResizeStart = (index) => (event) => {
-        if (event.button === 2) {
-            setDragging(true);
-            setDraggingColumn(index);
-            setInitialWidth(event.clientX);
-            event.preventDefault();
-          }
+        
+        setDragging(true);
+        setDraggingColumn(index);
+        setInitialWidth(event.clientX);
+        event.preventDefault();
+        
     };
     const handleColumnResize = (event) => {
-        // if (dragging ) {
-        //     const newWidth = event.clientX - initialWidth;
-        //     const newColumnWidths = [...columnWidths];
-        //     newColumnWidths[draggingColumn] += newWidth;
-        //     setColumnWidths(newColumnWidths);
-        //     setInitialWidth(event.clientX);
-        // }
-        event.preventDefault();
-        if (dragging && event.button === 0 && draggingColumn !== 0) {
+          if (dragging && event.button === 0 && draggingColumn !== null){
             const newWidth = event.clientX - initialWidth;
-            const newColumnWidths = columnWidths.map((width, index) => {
-                console.log(width,index);
-              if (index === draggingColumn) {
-                const minWidth = 80; // Minimum width for the column
-                const updatedWidth = width + newWidth;
-                return updatedWidth < minWidth ? minWidth : updatedWidth;
-              }
-              return width;
-            });
-        
+            const newColumnWidths = [...columnWidths];
+            newColumnWidths[draggingColumn] += newWidth;
             setColumnWidths(newColumnWidths);
-          }
-    };
+            setInitialWidth(event.clientX);
+        }
+      };
+    // const handleColumnResize = (event) => {
+        
+        
+    //     if (dragging && event.button === 0 && draggingColumn !== null) {
+    //         const newWidth = event.clientX - initialWidth;
+    //         const newColumnWidths = columnWidths.map((width, index) => {
+    //             let newColumnWidth;
+    //           if (index === draggingColumn) {
+                
+    //             if (index === 0) {
+    //                 newColumnWidth = Math.max(width + newWidth, 80);
+    //                 // newColumnWidth = Math.min(newColumnWidth, 300);
+                 
+    //             } else if (index === 1) {
+    //                 newColumnWidth = Math.max(width + newWidth, 150);
+    //                 // newColumnWidth = Math.min(newColumnWidth, 500);
+    //             } else if (index === 2) {
+    //                 newColumnWidth = Math.max(width + newWidth, 150);
+    //                 // newColumnWidth = Math.min(newColumnWidth, 500);
+    //             } else if (index === 3) {
+    //                 newColumnWidth = Math.max(width + newWidth, 150);
+    //                 // newColumnWidth = Math.min(newColumnWidth, 500);
+    //             } else if (index === 4) {
+    //                 newColumnWidth = Math.max(width + newWidth, 80);
+    //                 // newColumnWidth = Math.min(newColumnWidth, 300);
+    //             }
+    //             return newColumnWidth;
+    //           }
+    //           return width;
+    //         });
+    //         setColumnWidths(newColumnWidths);
+    //       }
+            
+        
+
+    // };
+
     const handleColumnResizeEnd = () => {
         setDragging(false);
     };
@@ -256,11 +275,11 @@ const Table1 = () => {
 
         const newColumnWidths = data.reduce((widths, item) => {
             columnsToCalculate.forEach((key, index) => {
-                
-                
+
+
                 const cellContent = item[key].toString();
                 console.log(cellContent);
-                const cellWidth = cellContent.length * 20;
+                const cellWidth = cellContent.length * 10;
                 console.log(cellWidth);
                 if (!widths[index] || cellWidth > widths[index]) {
                     widths[index] = cellWidth;
@@ -268,6 +287,7 @@ const Table1 = () => {
             });
 
             return widths;
+
         }, []);
 
         setColumnWidths(newColumnWidths);
@@ -277,29 +297,31 @@ const Table1 = () => {
 
     return (
         <>
-            <div className='Menu' onMouseDown={handleMouseDown} >
+            <div className='Menu'
+            >
 
 
-                <table responsive onMouseMove={handleColumnResize}
+                <table responsive
+                    onMouseMove={handleColumnResize}
                     onMouseUp={handleColumnResizeEnd}
-                    // border={1}
+                    onMouseDown={handleMouseDown}
                     className="light-border-table"
+
                 >
 
                     <thead>
 
                         <tr className='center-alignth'>
                             {/* ${styleColumnAutoWidth?'styleColumn':''}` */}
+
                             <th className={colNumber === 0 ? 'selected' : ''}
                                 onClick={() => handlethselect(0)}
-                                style={{ width: columnAutoWidth ? '80px' : columnWidths[0] + 'px' }}
-                                // style={{
-                                //     width: columnWidths[0], textAlign: 'center'
-
-                                // }}
+                                style={{ width: columnWidths['50px'] }}
+                                
                                 onMouseDown={(event) => handleMouseDown(event, 0)}>
+                                {/* onMouseMove={(event)=>handleColumnResize(event,0)} */}
                                 <span className='fn'>
-                                    {/* id  */}
+                                    
                                     id
                                     <SortIcon
                                         onClick={() => handleSort('id')}
@@ -316,7 +338,7 @@ const Table1 = () => {
 
                             <th className={colNumber === 1 ? 'selected' : ''}
                                 onClick={() => handlethselect(1)}
-                                style={{ width: columnWidths[1] }}
+                                style={{ width: columnWidths['100px'] }}
                                 onMouseDown={(event) => handleMouseDown(event, 1)}>
                                 <span className='fn'>
 
@@ -326,17 +348,13 @@ const Table1 = () => {
                                         sortOrder={colNumber === 1 ? sortOrder : ''}
                                     />
                                 </span>
-                                {/* FirstName
-                                <SortIcon
-                                    onClick={() => handleSort('firstName')}
-                                    sortOrder={colNumber === 1 ? sortOrder : ''}
-                                /> */}
                                 
+
                                 <MoreVertIcon onMouseDown={handleColumnResizeStart(1)} className='iconstyle1' />
                             </th>
                             <th className={colNumber === 2 ? 'selected' : ''}
                                 onClick={() => handlethselect(2)}
-                                style={{ width: columnWidths[2] }} >
+                                style={{ width: columnWidths['100px'] }} >
                                 <span className='fn'>
 
                                     LastName
@@ -345,17 +363,13 @@ const Table1 = () => {
                                         sortOrder={colNumber === 2 ? sortOrder : ''}
                                     />
                                 </span>
-                                {/* LastName
-                                <SortIcon
-                                    onClick={() => handleSort('lastName')}
-                                    sortOrder={colNumber === 2 ? sortOrder : ''}
-                                /> */}
+                               
                                 <MoreVertIcon onMouseDown={handleColumnResizeStart(2)} className='iconstyle2' />
 
                             </th>
                             <th className={colNumber === 3 ? 'selected' : ''}
                                 onClick={() => handlethselect(3)}
-                                style={{ width: columnWidths[3] }} >
+                                style={{ width: columnWidths['100px'] }} >
                                 <span className='fn'>
 
                                     MaidenName
@@ -364,18 +378,14 @@ const Table1 = () => {
                                         sortOrder={colNumber === 3 ? sortOrder : ''}
                                     />
                                 </span>
-                                {/* MaidenName
-                                <SortIcon
-                                    onClick={() => handleSort('maidenName')}
-                                    sortOrder={colNumber === 3 ? sortOrder : ''}
-                                /> */}
+                                
                                 <MoreVertIcon onMouseDown={handleColumnResizeStart(3)} className='iconstyle3' />
 
 
                             </th>
                             <th className={colNumber === 4 ? 'selected' : ''}
                                 onClick={() => handlethselect(4)}
-                                style={{ width: columnWidths[4] }}
+                                style={{ width: columnWidths['150px'] }}
                                 onMouseDown={(event) => handleMouseDown(event, 4)}>
                                 <span className='fn'>
 
@@ -385,18 +395,14 @@ const Table1 = () => {
                                         sortOrder={colNumber === 4 ? sortOrder : ''}
                                     />
                                 </span>
-                                {/* Age
-                                <SortIcon
-                                    onClick={() => handleSort('age')}
-                                    sortOrder={colNumber === 4 ? sortOrder : ''}
-                                /> */}
+                               
                                 <MoreVertIcon onMouseDown={handleColumnResizeStart(4)} className='iconstyle4' />
                             </th>
 
                         </tr>
                         <th>
                             <input onChange={handleSearchFilterId}
-                                style={{ width: columnAutoWidth ? '84px' : columnWidths[0] + 'px' }}
+                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[0] + 'px' }}
                             />
                         </th>
                         <th>
