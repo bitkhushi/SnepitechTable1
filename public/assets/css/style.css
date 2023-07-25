@@ -82,18 +82,25 @@
 
 td.right-align {
     text-align: right;
+    padding-right: 10px;
 }
-
+.alignmentText{
+    display: flex;
+    justify-content: center;
+}
 th.center-alignth {
     text-align: center;
+ 
 }
 
 td.center-align {
     text-align: center;
+   
 }
 
 td.left-align {
     text-align: left;
+  
 }
 
 .content .share {
@@ -124,39 +131,51 @@ td.left-align {
 }
 
 .iconstyle {
-    position: relative;
-    /* left: 62px; */
-    right: -20px;
+
+    position: absolute;
+    right: -8px;
+    top: 7px;
+
 }
+
 .iconstyleth {
     position: relative;
 }
+
 .iconstyle1 {
-    position: relative;
-    left: 30px;
+    position: absolute;
+    right: -8px;
+    top: 7px;
+
 }
 
 .iconstyle2 {
-    position: relative;
-    left: 30px;
+    position: absolute;
+    right: -8px;
+    top: 7px;
+
 }
 
 .iconstyle3 {
-    position: relative;
-    left: 18px;
+    position: absolute;
+    right: -8px;
+    top: 7px;
+
 }
 
 .iconstyle4 {
-    position: relative;
-    right: -22px;
-    /* left: 54px; */
+    position: absolute;
+    right: -8px;
+    top: 7px;
+
+
 }
 
 
-.fn {
+/* .fn {
     position: relative;
     left: 16px;
-}
+} */
 
 /* .dotted-table {
     border-collapse: collapse;
@@ -172,9 +191,11 @@ td.left-align {
 .styleColumn {
     padding: 10px;
 }
-.styleth{
+
+.styleth {
     width: 84px;
 }
+
 .light-border-table {
     border-collapse: collapse;
 }
@@ -183,5 +204,5 @@ td.left-align {
 .light-border-table th {
 
     border: 1px solid #ddd;
-    
+
 }
