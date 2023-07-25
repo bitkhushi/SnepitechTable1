@@ -413,7 +413,7 @@ const Table1 = () => {
                         {(searchFilter.length > 0 ? searchFilter : data).map((item) => (
 
                             <tr key={item.id}>
-
+                                
                                 <td className={`${colNumber === 0 ? 'selected right-align' : 'right-align'
                                     } `}
                                     onClick={() => handlethselect(0)} >{item.id}</td>
