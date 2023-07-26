@@ -124,10 +124,9 @@ const Table1 = () => {
         setSearch(searchValue);
     };
     const handleSortAscending = (a, b, column) => {
+        console.log(a[column]);
         if (column === 'age' || column === 'id') {
             return a[column] - b[column];
-
-
         } else {
             return a[column].localeCompare(b[column]);
 
@@ -151,7 +150,7 @@ const Table1 = () => {
         const sortedData = [...data].sort((a, b) => {
             return sortFunction(a, b, column);
         });
-
+        console.log(sortedData);
         setData(sortedData);
 
         const newSortOrder = isAsc ? 'desc' : 'asc';
@@ -220,7 +219,7 @@ const Table1 = () => {
         event.preventDefault();
 
     };
-   
+
     const handleColumnResize = (event) => {
         // ... (existing code)
 
@@ -230,7 +229,7 @@ const Table1 = () => {
 
             if (draggingColumn === 0) {
                 newColumnWidths[0] += newWidth;
-                newColumnWidths[0] = Math.max(newColumnWidths[0], 80); 
+                newColumnWidths[0] = Math.max(newColumnWidths[0], 80);
             } else if (draggingColumn === 1) {
                 newColumnWidths[1] += newWidth;
                 newColumnWidths[1] = Math.max(newColumnWidths[1], 120); // Minimum width of 100px for the second column
@@ -249,7 +248,7 @@ const Table1 = () => {
             setInitialWidth(event.clientX);
         }
     };
-   
+
     const handleColumnResizeEnd = () => {
         setDragging(false);
     };
@@ -260,7 +259,7 @@ const Table1 = () => {
 
         const newColumnWidths = data.reduce((widths, item) => {
             columnsToCalculate.forEach((key, index) => {
-                
+
                 const cellContent = item[key].toString();
                 console.log(cellContent);
                 const cellWidth = cellContent.length * 15;
@@ -296,40 +295,40 @@ const Table1 = () => {
                     <thead>
 
                         <tr className='center-alignth'>
-                            
+
 
                             <th className={colNumber === 0 ? 'selected' : ''}
                                 onClick={() => handlethselect(0)}
-                                style={{ width: columnWidths['80px'] , position:'relative'}}
+                                style={{ width: columnWidths['80px'], position: 'relative' }}
 
                                 onMouseDown={(event) => handleMouseDown(event, 0)}>
                                 <span className='fn'>
 
                                     <span className='alignmentText'>id
-                                    <SortIcon
-                                        onClick={() => handleSort('id')}
-                                        sortOrder={colNumber === 0 ? sortOrder : ''}
-                                    />
+                                        <SortIcon
+                                            onClick={() => handleSort('id')}
+                                            sortOrder={colNumber === 0 ? sortOrder : ''}
+                                        />
                                     </span>
-                                   
+
                                 </span>
-                               
+
                                 <TfiSplitH onMouseDown={handleColumnResizeStart(0)} className='iconstyle' />
-                                
+
 
                             </th>
 
                             <th className={colNumber === 1 ? 'selected' : ''}
                                 onClick={() => handlethselect(1)}
-                                style={{ width: columnWidths['100px'] ,position:'relative'}}
+                                style={{ width: columnWidths['100px'], position: 'relative' }}
                                 onMouseDown={(event) => handleMouseDown(event, 1)}>
                                 <span className='fn'>
                                     <span className='alignmentText'>
-                                    FirstName
-                                    <SortIcon
-                                        onClick={() => handleSort('firstName')}
-                                        sortOrder={colNumber === 1 ? sortOrder : ''}
-                                    />
+                                        FirstName
+                                        <SortIcon
+                                            onClick={() => handleSort('firstName')}
+                                            sortOrder={colNumber === 1 ? sortOrder : ''}
+                                        />
                                     </span>
                                 </span>
 
@@ -338,15 +337,15 @@ const Table1 = () => {
                             </th>
                             <th className={colNumber === 2 ? 'selected' : ''}
                                 onClick={() => handlethselect(2)}
-                                style={{ width: columnWidths['100px'],position:'relative' }} >
+                                style={{ width: columnWidths['100px'], position: 'relative' }} >
                                 <span className='fn'>
-                                <span className='alignmentText'>
-                                    LastName
-                                    <SortIcon
-                                        onClick={() => handleSort('lastName')}
-                                        sortOrder={colNumber === 2 ? sortOrder : ''}
-                                    />
-                                      </span>
+                                    <span className='alignmentText'>
+                                        LastName
+                                        <SortIcon
+                                            onClick={() => handleSort('lastName')}
+                                            sortOrder={colNumber === 2 ? sortOrder : ''}
+                                        />
+                                    </span>
                                 </span>
 
                                 <TfiSplitH onMouseDown={handleColumnResizeStart(2)} className='iconstyle2' />
@@ -354,14 +353,14 @@ const Table1 = () => {
                             </th>
                             <th className={colNumber === 3 ? 'selected' : ''}
                                 onClick={() => handlethselect(3)}
-                                style={{ width: columnWidths['100px'],position:'relative'}} >
+                                style={{ width: columnWidths['100px'], position: 'relative' }} >
                                 <span className='fn'>
-                                <span className='alignmentText'>
-                                    MaidenName
-                                    <SortIcon
-                                        onClick={() => handleSort('maidenName')}
-                                        sortOrder={colNumber === 3 ? sortOrder : ''}
-                                    />
+                                    <span className='alignmentText'>
+                                        MaidenName
+                                        <SortIcon
+                                            onClick={() => handleSort('maidenName')}
+                                            sortOrder={colNumber === 3 ? sortOrder : ''}
+                                        />
                                     </span>
                                 </span>
 
@@ -371,15 +370,15 @@ const Table1 = () => {
                             </th>
                             <th className={colNumber === 4 ? 'selected' : ''}
                                 onClick={() => handlethselect(4)}
-                                style={{ width: columnWidths['160px'],position:'relative'}}
+                                style={{ width: columnWidths['160px'], position: 'relative' }}
                                 onMouseDown={(event) => handleMouseDown(event, 4)}>
                                 <span className='fn'>
-                                <span className='alignmentText'>
-                                    Age
-                                    <SortIcon
-                                        onClick={() => handleSort('age')}
-                                        sortOrder={colNumber === 4 ? sortOrder : ''}
-                                    />
+                                    <span className='alignmentText'>
+                                        Age
+                                        <SortIcon
+                                            onClick={() => handleSort('age')}
+                                            sortOrder={colNumber === 4 ? sortOrder : ''}
+                                        />
                                     </span>
                                 </span>
 
@@ -394,7 +393,7 @@ const Table1 = () => {
                         </th>
                         <th>
                             <input onChange={handleSearchFilterFirstName}
-                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[1] + 'px' }}/>
+                                style={{ width: columnAutoWidth ? 'auto' : columnWidths[1] + 'px' }} />
                         </th>
                         <th>
                             <input onChange={handleSearchFilterLastName}
@@ -413,7 +412,7 @@ const Table1 = () => {
                         {(searchFilter.length > 0 ? searchFilter : data).map((item) => (
 
                             <tr key={item.id}>
-                                
+
                                 <td className={`${colNumber === 0 ? 'selected right-align' : 'right-align'
                                     } `}
                                     onClick={() => handlethselect(0)} >{item.id}</td>
