@@ -16,8 +16,8 @@
 }
 
 .itemlist {
-    position: absolute;
-    top: 86%;
+        /* position: absolute;
+        top: 86%; */
 }
 
 .itemlist1 {
@@ -29,7 +29,7 @@
 .wrapper {
     position: absolute;
     width: 300px;
-    height: 350px;
+    height: 403px;
     top: 34%;
     left: 31%;
     border-radius: 10px;
@@ -51,7 +51,7 @@
     align-items: center;
     border-radius: 5px;
     margin-bottom: 2px;
-    padding: 0 5px 0 10px;
+    padding: 0 5px 0 5px;
 }
 
 .content .item:hover {
@@ -167,27 +167,8 @@ td.left-align {
     position: absolute;
     right: -8px;
     top: 7px;
-
-
 }
 
-
-/* .fn {
-    position: relative;
-    left: 16px;
-} */
-
-/* .dotted-table {
-    border-collapse: collapse;
-  
-}
-
-.dotted-table td,
-.dotted-table th {
-    border: 2px dotted rgba(0, 0, 0, 0.2);;
-    padding: 8px;
-    
-} */
 .styleColumn {
     padding: 10px;
 }
@@ -206,3 +187,8 @@ td.left-align {
     border: 1px solid #ddd;
 
 }
+.selected-row{
+    background-color: lightblue;
+
+}
+

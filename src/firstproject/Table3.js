@@ -8,6 +8,7 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import * as XLSX from "xlsx/xlsx.mjs";
 import { CSVLink } from 'react-csv';
 const Table3 = () => {
+
     const [dataOfKey, setDataOfKey] = useState([]);
     const [dataOfValue, setDataOfValue] = useState([]);
 
@@ -23,17 +24,19 @@ const Table3 = () => {
 
     const [styleColumnAutoWidth, setStyleColumnAutoWidth] = useState(false);
 
+    const [columnWidths, setColumnWidths] = useState(Array(dataOfKey.length).fill(150));
     const [dragging, setDragging] = useState(false);
     const [draggingColumn, setDraggingColumn] = useState(null);
     const [initialWidth, setInitialWidth] = useState(0);
-    const [columnWidths, setColumnWidths] = useState([150]);
-    // const [columnWidths, setColumnWidths] = useState(Array(dataOfKey.length).fill(150));
+
     const [columnAutoWidth, setColumnAutoWidth] = useState(false);
-    
+
+    const [selectedColumn, setSelectedColumn] = useState(null);
+
     const filteredDataToRender = search !== '' ? searchFilter : dataOfValue;
     const fetchData = async () => {
         try {
-            const res = await fetch("https://dummyjson.com/users", {
+            const res = await fetch('https://dummyjson.com/users', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json', }
             });
@@ -51,6 +54,7 @@ const Table3 = () => {
 
     useEffect(() => {
         fetchData();
+        setColumnWidths(Array(dataOfKey.length).fill(150));
     }, []);
 
     const handleSortAscending = (column) => (a, b) => {
@@ -66,7 +70,6 @@ const Table3 = () => {
 
         return aValue - bValue;
     };
-
     const handleSortDescending = (column) => (a, b) => {
         const aValue = a[dataOfKey[column]];
         const bValue = b[dataOfKey[column]];
@@ -80,8 +83,8 @@ const Table3 = () => {
 
         return bValue - aValue;
     };
-
     const handleSort = (column) => {
+
         const isAsc = colNumber === column && sortOrder === 'asc';
         const sortFunction = isAsc ? handleSortAscending(column) : handleSortDescending(column);
 
@@ -95,7 +98,6 @@ const Table3 = () => {
 
 
     };
-
     const SortIcon = ({ sortOrder }) => {
         if (sortOrder === 'asc') {
             return <ArrowDropDownIcon />;
@@ -105,7 +107,6 @@ const Table3 = () => {
             return <ArrowDropDownIcon />;
         }
     };
-
     const handleSearchFilter = (index, e) => {
         const searchValue = e.target.value;
         setSearch(searchValue);
@@ -122,17 +123,13 @@ const Table3 = () => {
         }
 
     };
-
     const click = (event) => {
-        console.log(event);
-        setListExportMenuVisible(!ListExportMenuVisible);
+        setListExportMenuVisible(true);
     };
-
     const handleMouseDown = (event) => {
 
         if (event.button === 2) {
             setMenuVisible(true)
-            console.log(event.button);
         } else if (event.button === 0) {
             setMenuVisible(false)
         }
@@ -163,8 +160,6 @@ const Table3 = () => {
 
         XLSX.writeFile(workbook, fileName);
     };
-
-
     const convertDataForCSV = () => {
         return dataOfValue.map((row) => ({
             ...dataOfKey.reduce((acc, key) => {
@@ -177,52 +172,45 @@ const Table3 = () => {
         setDragging(true);
         setDraggingColumn(index);
         setInitialWidth(event.clientX);
-        // event.preventDefault();
+
     };
+    const handleColumnResize = (event, index) => {
 
-    const handleColumnResize = (event , index) => {
-            console.log(index);
-        // if (dragging && event.button === 0 && draggingColumn !== null) {
+        if (dragging && event.button === 0 && draggingColumn !== null) {
+            const newWidth = event.clientX - initialWidth;
+            const newColumnWidths = [...columnWidths];
+            newColumnWidths[draggingColumn] += newWidth;
 
-        //     const newWidth = event.clientX - initialWidth;
+            if (!isNaN(newColumnWidths[draggingColumn])) {
+                newColumnWidths[draggingColumn] = Math.max(newColumnWidths[draggingColumn], 100);
+            } else {
+                newColumnWidths[draggingColumn] = 150;
+            }
 
-        //     const newColumnWidths = [...columnWidths];
-        //     console.log(newColumnWidths);
-        //     newColumnWidths[draggingColumn] += newWidth;
-        //     newColumnWidths[draggingColumn] = Math.max(newColumnWidths[draggingColumn], 80);
-
-        //     setColumnWidths(newColumnWidths);
-        //     setInitialWidth(event.clientX);
-        // }
+            setColumnWidths(newColumnWidths);
+            setInitialWidth(event.clientX);
+        }
     };
-
     const handleColumnResizeEnd = () => {
         setDragging(false);
     };
+    const HandleAutoWidthOfColumn = () => {
+        const newColumnWidths = [...columnWidths];
 
+        dataOfValue.forEach((item) => {
+            dataOfKey.forEach((key, index) => {
+                const cellContent = item[key]?.toString() || '';
+                const cellWidth = cellContent.length + 120;
+                console.log(cellWidth);
+                if (!newColumnWidths[index] || cellWidth > newColumnWidths[index]) {
+                    newColumnWidths[index] = cellWidth;
+                }
+            });
+        });
 
-    // const HandleAutoWidthOfColumn = () => {
-
-    //     const columnsToCalculate = ['id', 'firstName', 'lastName', 'maidenName', 'age'];
-
-    //     const newColumnWidths = dataOfValue.reduce((widths, item) => {
-    //         columnsToCalculate.forEach((key, index) => {
-
-    //             const cellContent = item[key].toString();
-    //             const cellWidth = cellContent.length * 10;
-    //             if (!widths[index] || cellWidth > widths[index]) {
-    //                 widths[index] = cellWidth;
-    //             }
-
-    //         });
-
-    //         return widths;
-
-    //     }, []);
-
-    //     setColumnWidths(newColumnWidths);
-    //     setStyleColumnAutoWidth(true);
-    // };
+        setColumnWidths(newColumnWidths);
+        setStyleColumnAutoWidth(true);
+    };
 
 
     return (
@@ -231,40 +219,59 @@ const Table3 = () => {
                 onMouseMove={handleColumnResize}
                 onMouseUp={handleColumnResizeEnd}
                 onMouseDown={handleMouseDown}>
-                <colgroup>
+                <colgroup >
                     {dataOfKey.map((key, index) => (
-                        <col key={index} style={{ width: columnWidths[index] }} />
-                    ))}
+                        <col
+                            key={index}
+                            style={{ width: columnAutoWidth ? 'auto' : columnWidths[index] + 'px' }}
+                            className={selectedColumn === index ? 'selected' : ''}
+                            onMouseMove={(event) => handleColumnResize(event, index)}
+                        />))}
                 </colgroup>
                 <thead>
                     <tr>
-                        {
-                            dataOfKey.map((value, index) => (
-                                <th key={index} style={{ position: 'relative', width: columnWidths[index] }}>
-                                    <div>
-                                        <span className='fn' onClick={() => handleSort(index)}>
-                                            {value}
-                                            <SortIcon sortOrder={colNumber === index ? sortOrder : ''} />
-                                        </span>
-                                        <TfiSplitH className='iconstyle' onMouseDown={handleColumnResizeStart(index)} onMouseMove={handleColumnResize(index)} />
-                                    </div>
-                                    <div>
-                                        <input type="text"
-                                            onChange={(e) => handleSearchFilter(index, e)}
-                                            style={{ width: columnAutoWidth }}
-                                        />
-
-                                    </div>
-                                </th>
-                            ))}
+                        {dataOfKey.map((value, index) => (
+                            <th key={index} style={{ position: 'relative', width: columnWidths[index] }}
+                            
+                            onClick={() => setSelectedColumn(index)}
+                            >
+                                <div>
+                                    <span className='fn' onClick={() => handleSort(index)}>
+                                        {value}
+                                        <SortIcon sortOrder={colNumber === index ? sortOrder : ''} />
+                                    </span>
+                                    <TfiSplitH className='iconstyle' onMouseDown={handleColumnResizeStart(index)} />
+                                </div>
+                            </th>
+                        ))}
                     </tr>
                 </thead>
+                <tr>
+
+                    {
+                        dataOfKey.map((value, index) => (
+                            <th key={index} style={{ position: 'relative', width: columnWidths[index]}}>
+                                <div>
+                                    <input type="text"
+                                        onChange={(e) => handleSearchFilter(index, e)}
+                                        style={{
+                                            width: columnAutoWidth ? 'auto' : columnWidths[index] + 'px',
+                                        }}
+                                    />
+                                </div>
+                            </th>
+                        ))}
+                </tr>
+
+
                 <tbody>
                     {
                         filteredDataToRender.map((row, index) => (
-                            <tr key={index} style={{ position: 'relative', width: columnWidths[index] }}>
+                            <tr key={index}
+                                
+                                style={{ position: 'relative', width: columnWidths[index] }} >
                                 {dataOfKey.map((key, innerIndex) => (
-                                    <td key={innerIndex}>{row[key].toString()}</td>
+                                    <td key={innerIndex} >{row[key].toString()}</td>
                                 ))}
                             </tr>
                         ))}
@@ -278,7 +285,7 @@ const Table3 = () => {
                     <div className="wrapper">
                         <div className="content">
                             <ul className="menu">
-                                <li className="item"   >
+                                <li className="item" onClick={HandleAutoWidthOfColumn}  >
                                     <ContentPasteIcon />
                                     <span>AutoWidth</span>
                                 </li>
@@ -301,29 +308,25 @@ const Table3 = () => {
                                     </span>
                                 </li>
 
-
                                 {
                                     ListExportMenuVisible && (
-                                        <div className='ExcelDropDownList'>
-                                            <li className="item">
-                                                <li className="itemlist" onClick={handleExExport}>
-                                                    <span>Excel Export</span>
-                                                </li>
+                                        <>
+                                            <li className="item" onClick={handleExExport}>
+                                                {/* <ContentPasteIcon /> */}
+                                                <span>Excel Export</span>
                                             </li>
-                                            <li className="item">
-                                                <li className="itemlist1">
-                                                    <CSVLink data={convertDataForCSV()}
-                                                        headers={dataOfKey.map((key) => ({ label: key, key: key }))}
-                                                        filename={'exported_data.csv'}
-                                                        style={{ color: 'black', textDecoration: 'none' }}
-                                                    >
-                                                        <span>CSV Export</span>
-                                                    </CSVLink>
-                                                </li>
-                                            </li>
-                                        </div>
-                                    )}
+                                            <li className="item" onClick={handleExExport}>
 
+                                                <span>CSV Export</span>
+                                                <CSVLink data={convertDataForCSV()}
+                                                    headers={dataOfKey.map((key) => ({ label: key, key: key }))}
+                                                    filename={'exported_data.csv'}
+                                                    style={{ color: 'black', textDecoration: 'none' }}
+                                                />
+                                            </li>
+                                        </>
+
+                                    )}
                             </ul>
                         </div>
                     </div>

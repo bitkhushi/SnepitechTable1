@@ -26,7 +26,8 @@ const Table1 = () => {
     const [initialWidth, setInitialWidth] = useState(0);
     const [columnWidths, setColumnWidths] = useState([150, 150, 150, 150, 150]);
     const [columnAutoWidth, setColumnAutoWidth] = useState(false);
-
+    
+    
     const fetchData = async () => {
         try {
             const response = await fetch("https://dummyjson.com/users");
